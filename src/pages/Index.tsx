@@ -1,14 +1,24 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { BookOpen, ShoppingBag, RefrigeratorIcon, Sparkles } from 'lucide-react';
+import { BookOpen, ShoppingBag, RefrigeratorIcon, Sparkles, LogIn } from 'lucide-react';
 import { useRecipes } from '@/context/RecipeContext';
+import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
   const { recipes, pantryItems } = useRecipes();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  React.useEffect(() => {
+    // If authenticated, redirect to dashboard
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
   
   const features = [
     {
@@ -58,6 +68,21 @@ const Index = () => {
         >
           Organize recipes, track ingredients, and cook smarter
         </motion.p>
+        
+        <motion.div
+          className="mt-8 flex flex-wrap gap-4 justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Button size="lg" onClick={() => navigate('/signup')}>
+            Get Started
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => navigate('/login')}>
+            <LogIn className="mr-2 h-4 w-4" />
+            Sign In
+          </Button>
+        </motion.div>
       </div>
       
       <motion.div 
@@ -89,7 +114,7 @@ const Index = () => {
                   <p className="text-muted-foreground mb-4">{feature.description}</p>
                   <div className="mt-auto">
                     <Button variant="ghost" className="p-0 h-auto">
-                      Get Started →
+                      Learn More →
                     </Button>
                   </div>
                 </CardContent>
