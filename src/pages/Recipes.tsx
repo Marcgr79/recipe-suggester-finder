@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import RecipeCard from '@/components/RecipeCard';
 import RecipeDetail from '@/components/RecipeDetail';
+import RecipeForm from '@/components/RecipeForm';
 import Layout from '@/components/Layout';
 import { useRecipes } from '@/context/RecipeContext';
 
@@ -78,11 +79,29 @@ const RecipeDetailPage = () => {
   return <RecipeDetail recipe={recipe} />;
 };
 
+const NewRecipePage = () => {
+  return <RecipeForm />;
+};
+
+const EditRecipePage = () => {
+  const { recipes } = useRecipes();
+  const recipeId = window.location.pathname.split('/').pop();
+  const recipe = recipes.find(r => r.id === recipeId);
+  
+  if (!recipe) {
+    return <div>Recipe not found</div>;
+  }
+  
+  return <RecipeForm initialRecipe={recipe} />;
+};
+
 const RecipesPage = () => {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<RecipeGrid />} />
+        <Route path="/new" element={<NewRecipePage />} />
+        <Route path="/edit/:id" element={<EditRecipePage />} />
         <Route path="/:id" element={<RecipeDetailPage />} />
       </Routes>
     </Layout>

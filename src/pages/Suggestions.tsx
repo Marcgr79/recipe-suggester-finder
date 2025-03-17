@@ -71,7 +71,7 @@ const SuggestionsPage = () => {
               <RecipeCard 
                 key={recipe.id} 
                 recipe={recipe} 
-                matchPercentage={recipe.score * 100}
+                matchPercentage={(recipe as any).score * 100}
                 index={index}
               />
             ))}
