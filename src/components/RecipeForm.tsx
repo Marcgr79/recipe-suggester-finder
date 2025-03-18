@@ -113,22 +113,56 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe }) => {
       return;
     }
 
-    const recipeData = {
-      name: data.name,
-      ingredients: ingredients,
-      instructions: instructions,
-      prepTime: data.prepTime,
-      cookTime: data.cookTime,
-      image: data.imageUrl,
-    };
-
     if (initialRecipe) {
-      updateRecipe(initialRecipe.id, recipeData);
+      // For updating recipes, map the ingredients and instructions to include IDs
+      const updatedIngredients = ingredients.map((ing, index) => {
+        // Use existing ID if available, otherwise create a new one
+        const existingIng = initialRecipe.ingredients[index];
+        return {
+          id: existingIng?.id || `ing-${Date.now()}-${index}`,
+          ...ing
+        };
+      });
+
+      const updatedInstructions = instructions.map((ins, index) => {
+        // Use existing ID if available, otherwise create a new one
+        const existingIns = initialRecipe.instructions[index];
+        return {
+          id: existingIns?.id || `ins-${Date.now()}-${index}`,
+          ...ins
+        };
+      });
+
+      updateRecipe(initialRecipe.id, {
+        name: data.name,
+        ingredients: updatedIngredients,
+        instructions: updatedInstructions,
+        prepTime: data.prepTime,
+        cookTime: data.cookTime,
+        image: data.imageUrl,
+      });
       toast({
         title: "Recipe updated",
         description: `${data.name} has been updated successfully.`,
       });
     } else {
+      // For new recipes, the addRecipe function will handle the ID generation
+      // But we still need to convert the ingredient and instruction objects to the right format
+      const recipeData = {
+        name: data.name,
+        ingredients: ingredients.map(ing => ({
+          ...ing,
+          id: '' // This ID will be replaced by the addRecipe function
+        })),
+        instructions: instructions.map(ins => ({
+          ...ins,
+          id: '' // This ID will be replaced by the addRecipe function
+        })),
+        prepTime: data.prepTime,
+        cookTime: data.cookTime,
+        image: data.imageUrl,
+      };
+      
       addRecipe(recipeData);
       toast({
         title: "Recipe added",

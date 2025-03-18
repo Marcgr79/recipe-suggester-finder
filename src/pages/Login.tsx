@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,13 +6,10 @@ import { Button } from '@/components/ui/button';
 import { FaGoogle } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { useClerk, SignIn } from '@clerk/clerk-react';
 
 const Login = () => {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { loaded: clerkLoaded } = useClerk();
-  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -30,28 +28,6 @@ const Login = () => {
     }
   };
 
-  // If Clerk is available, use Clerk's SignIn component
-  if (PUBLISHABLE_KEY && clerkLoaded) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full max-w-md"
-        >
-          <SignIn 
-            routing="path" 
-            path="/login" 
-            signUpUrl="/signup"
-            redirectUrl="/dashboard"
-          />
-        </motion.div>
-      </div>
-    );
-  }
-
-  // Otherwise, use the mock login
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
       <motion.div
