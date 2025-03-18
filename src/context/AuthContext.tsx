@@ -1,5 +1,6 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useClerk, useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 
 type User = {
   id: string;
@@ -31,8 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
   
-  // Use Clerk hooks if available
-  const clerk = useClerk();
+  // For Clerk integration
   const { user: clerkUser, isLoaded: clerkIsLoaded } = useUser();
 
   // Check for existing login on mount
@@ -63,15 +63,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [PUBLISHABLE_KEY, clerkUser, clerkIsLoaded]);
 
-  // Login function that uses Clerk if available, otherwise uses mock
+  // Login function that uses mock auth since Clerk is handled separately
   const login = async () => {
-    setIsLoading(true);
-    try {
-      if (PUBLISHABLE_KEY && clerk.loaded) {
-        // If using Clerk, open the sign-in modal
-        await clerk.openSignIn();
-      } else {
-        // Otherwise, create a mock user
+    if (!PUBLISHABLE_KEY) {
+      setIsLoading(true);
+      try {
+        // Create a mock user
         const mockUser: User = {
           id: 'user-' + Math.random().toString(36).substring(2, 9),
           name: 'Demo User',
@@ -80,31 +77,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         setUser(mockUser);
         localStorage.setItem('user', JSON.stringify(mockUser));
+      } catch (error) {
+        console.error('Login failed:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
-      setIsLoading(false);
     }
+    // If using Clerk, login is handled by Clerk UI
+    return Promise.resolve();
   };
 
-  // Logout function that uses Clerk if available, otherwise uses mock
+  // Logout function that uses mock auth since Clerk is handled separately
   const logout = async () => {
-    setIsLoading(true);
-    try {
-      if (PUBLISHABLE_KEY && clerk.loaded) {
-        // If using Clerk, sign out
-        await clerk.signOut();
-      } else {
-        // Otherwise, just clear the local storage
+    if (!PUBLISHABLE_KEY) {
+      setIsLoading(true);
+      try {
         setUser(null);
         localStorage.removeItem('user');
+      } catch (error) {
+        console.error('Logout failed:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setIsLoading(false);
     }
+    // If using Clerk, logout is handled by Clerk UI
+    return Promise.resolve();
   };
 
   return (
